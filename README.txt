@@ -1,1 +1,1 @@
-Log decrator implementation
+Incremental sync file to Oracle object storage.
