@@ -13,6 +13,6 @@ def upload_binary_data(url, data):
 
 binary_data = bytes('data to be encoded: 你好', 'utf-8')
 
-upload_url = 'http://localhost:5000/write-bytes?name=write_bytes.bin&position=0&append=true'
+upload_url = 'http://localhost:5000/write-bytes?bucket=Hysun_DianJiang&name=test1.bin&position=-1&append=true&destination=testcase2/test1.bin'
 
 upload_binary_data(upload_url, binary_data)

@@ -5,6 +5,7 @@ import os
 import subprocess
 import base64
 
+from pathlib import Path
 from flask import Flask, request
 from devlog import my_logger as log_utils
 
@@ -47,18 +48,14 @@ def write_json():
 
     ensure_file_exists(file_fullname)
 
-    with open(file_fullname, 'rb+') as dest_file:
-        logger.debug('Write content to file. file_position: %d, %d',
-                     file_position, whence)
-        dest_file.seek(0 if file_position < 0 else file_position, whence)
-        dest_file.write(content_bytes)
-
-    if append and str(append).lower() not in ('true', '1'):
-        logger.debug('Upload file %s...', file_name)
-        sync_object_storage(bucket, file_fullname, destination)
-        logger.debug('Upload file %s...done', file_name)
-        delete_file(file_fullname)
-        logger.debug('Local file %s...deleted', file_name)
+    handle_content(file_fullname=file_fullname,
+                   file_name=file_name,
+                   file_position=file_position,
+                   whence=whence,
+                   content_bytes=content_bytes,
+                   append=append,
+                   bucket=bucket,
+                   destination=destination)
 
     return 'OK'
 
@@ -88,6 +85,40 @@ def write_bytes():
 
     ensure_file_exists(file_fullname)
 
+    handle_content(file_fullname=file_fullname,
+                   file_name=file_name,
+                   file_position=file_position,
+                   whence=whence,
+                   content_bytes=content_bytes,
+                   append=append,
+                   bucket=bucket,
+                   destination=destination)
+
+    return 'OK'
+
+
+def ensure_file_exists(file_name):
+    """ docstring """
+    if os.path.isfile(file_name):
+        return  # file already exists
+
+    file_path = Path(file_name)
+    file_dir = file_path.parent.absolute()
+    command = f'mkdir -p {file_dir} && touch {file_name}'
+    try:
+        with log_utils.safe_rich_status(
+                f'[bold cyan]Creating file {file_name}[/]'):
+            subprocess.check_output(command, shell=True)
+    except subprocess.CalledProcessError as ex:
+        logger.error(ex.output)
+        with log_utils.print_exception_no_traceback():
+            raise IOError(f'Failed to create file {file_name}.') from ex
+
+
+# pylint: disable=too-many-arguments
+def handle_content(file_fullname, file_name, file_position, whence,
+                   content_bytes, append, bucket, destination):
+    """ docstring """
     with open(file_fullname, 'rb+') as dest_file:
         logger.debug('Write content to file. file_position: %d, %d',
                      file_position, whence)
@@ -101,39 +132,30 @@ def write_bytes():
         delete_file(file_fullname)
         logger.debug('Local file %s...deleted', file_name)
 
-    return 'OK'
 
-
-def ensure_file_exists(file_name):
+def delete_file(file_fullname, file_name):
     """ docstring """
-    if os.path.isfile(file_name):
+    if not os.path.isfile(file_fullname):
         return  # file already exists
 
-    command = f'mkdir -p {_WORK_DIR} && touch {file_name}'
-    try:
-        with log_utils.safe_rich_status(
-                f'[bold cyan]Creating file {file_name}[/]'):
-            subprocess.check_output(command, shell=True)
-    except subprocess.CalledProcessError as ex:
-        logger.error(ex.output)
-        with log_utils.print_exception_no_traceback():
-            raise IOError(f'Failed to create file {file_name}.') from ex
-
-
-def delete_file(file_name):
-    """ docstring """
-    if not os.path.isfile(file_name):
-        return  # file already exists
-
-    command = f'rm -f {file_name}'
-    try:
-        with log_utils.safe_rich_status(
-                f'[bold cyan]Deleting file {file_name}[/]'):
-            subprocess.check_output(command, shell=True)
-    except subprocess.CalledProcessError as ex:
-        logger.error(ex.output)
-        with log_utils.print_exception_no_traceback():
-            raise IOError(f'Failed to delete file {file_name}.') from ex
+    tmp_dir = file_name
+    while True:
+        tmp_dir = Path(tmp_dir)
+        if str(tmp_dir) in ('.', '~', '/'):
+            break
+        
+        command = f'rm -rf {tmp_dir}'
+        try:
+            with log_utils.safe_rich_status(
+                    f'[bold cyan]Deleting file {file_name}[/]'):
+                subprocess.check_output(command, shell=True)
+        except subprocess.CalledProcessError as ex:
+            logger.error(ex.output)
+            with log_utils.print_exception_no_traceback():
+                raise IOError(f'Failed to delete file {file_name}.') from ex
+            
+        tmp_dir_parent = tmp_dir.parent
+        tmp_dir = tmp_dir_parent
 
 
 def sync_object_storage(bucket_name: str, src_file: str, dest_file: str):
