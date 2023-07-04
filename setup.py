@@ -67,8 +67,8 @@ setup(
     ],
     entry_points={  #把python文件中的函数自动生成为可执行脚本
         'console_scripts': [  # key值为console_scripts
-            'ossappend = oss-append:main'
+            'ossappend = oss_append:main'
         ]
     },
-    scripts=['oss-append.py']  #把.sh、.py等可执行脚本生成到系统path中
+    scripts=['oss_append.py']  #把.sh、.py等可执行脚本生成到系统path中
 )

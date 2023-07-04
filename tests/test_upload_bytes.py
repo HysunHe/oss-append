@@ -3,13 +3,12 @@ import requests
 
 def upload_binary_data(url, data):
     response = requests.post(url=url, data=data)
+    print(response.content)
     
-    print(f'Status: {response.status_code}')
     if response.status_code == 200:
-        print('Good')
+        print(response.json())
     else:
         print('Bad')
-
 
 binary_data = bytes('data to be encoded: 你好', 'utf-8')
 
