@@ -179,6 +179,8 @@ def sync_object_storage(bucket_name: str, src_file: str, dest_file: str):
         with log_utils.print_exception_no_traceback():
             raise IOError(f'Failed to upload file {src_file}.') from ex
 
-
-if __name__ == '__main__':
+def main():
     app.run()
+    
+if __name__ == '__main__':
+    main()
