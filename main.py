@@ -62,21 +62,21 @@ def write_json():
 
 @app.route('/write-bytes', methods=['POST'])
 def write_bytes():
+    # pylint: disable=line-too-long
     """ Sample call to this API:
-        response = requests.post(
-            url='http://localhost:5000/write-bytes?name=write_bytes.bin&position=0&append=true',
-            data=binary_data
-        )
+        binary_data = bytes('data to be encoded: 你好', 'utf-8')
+        url = 'http://localhost:5000/write-bytes?bucket=Hysun_DianJiang&name=testcase2/test1.bin&position=-1&append=true&destination=testcase2/test1.bin'
+        response = requests.post(url=url, data=binary_data)
     """
     content_bytes = request.get_data()
-    bucket = request.args.get['bucket']
+    bucket = request.args.get('bucket')
     file_name = request.args.get('name')
     file_fullname = f'{_WORK_DIR}/{file_name}'
     append = request.args.get('append')
     file_position = int('0' if not request.args.get('position') else request.
                         args.get('position'))
     destination = file_name if not request.args.get(
-        'destination') else request.args.get['destination']
+        'destination') else request.args.get('destination')
     whence = 2 if not request.args.get('position') or file_position < 0 else 0
     logger.debug('file_name: %s', file_name)
     logger.debug('file_position: %d, %d', file_position, whence)
@@ -129,7 +129,7 @@ def handle_content(file_fullname, file_name, file_position, whence,
         logger.debug('Upload file %s...', file_name)
         sync_object_storage(bucket, file_fullname, destination)
         logger.debug('Upload file %s...done', file_name)
-        delete_file(file_fullname)
+        delete_file(file_fullname=file_fullname, file_name=file_name)
         logger.debug('Local file %s...deleted', file_name)
 
 
@@ -143,7 +143,7 @@ def delete_file(file_fullname, file_name):
         tmp_dir = Path(tmp_dir)
         if str(tmp_dir) in ('.', '~', '/'):
             break
-        
+
         command = f'rm -rf {tmp_dir}'
         try:
             with log_utils.safe_rich_status(
@@ -153,7 +153,7 @@ def delete_file(file_fullname, file_name):
             logger.error(ex.output)
             with log_utils.print_exception_no_traceback():
                 raise IOError(f'Failed to delete file {file_name}.') from ex
-            
+
         tmp_dir_parent = tmp_dir.parent
         tmp_dir = tmp_dir_parent
 
