@@ -180,7 +180,7 @@ def sync_object_storage(bucket_name: str, src_file: str, dest_file: str):
             raise IOError(f'Failed to upload file {src_file}.') from ex
 
 def main():
-    app.run()
+    app.run(host='0.0.0.0')
     
 if __name__ == '__main__':
     main()
