@@ -28,7 +28,7 @@ setup(
         'cffi==1.15.1',
         'charset-normalizer==3.1.0',
         'circuitbreaker==1.4.0',
-        'click==8.0.4',
+        'click==8.1.3',
         'cryptography==39.0.2',
         'Flask==2.3.2',
         'idna==3.4',
