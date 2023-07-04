@@ -25,7 +25,7 @@ def write_json():
             url='http://localhost:5000/write-json',
             headers={'Content-Type': 'application/json'},
             json={
-                "bucket": "Hysun_DianJiang", 
+                "bucket": "Hysun_DianJiang",
                 "name":"demo2.bin",
                 "position": 260,
                 "content": base64.b64encode(binary_data).decode(encoding='utf-8'),

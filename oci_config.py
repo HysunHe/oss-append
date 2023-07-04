@@ -29,13 +29,13 @@ class OciConf:
     @classmethod
     def get_region(cls):
         """ docstring """
-        return cls.oci_config()['region']
+        return cls.oci_config()['region']  #pylint: disable=unsubscriptable-object
 
     @classmethod
     def get_namespace(cls):
         """ docstring """
         if cls._NAMESPACE is None:
             response = cls.object_storage_client().get_namespace(
-                compartment_id=cls.oci_config()['tenancy'])
+                compartment_id=cls.oci_config()['tenancy'])  #pylint: disable=unsubscriptable-object
             cls._NAMESPACE = response.data
         return cls._NAMESPACE
