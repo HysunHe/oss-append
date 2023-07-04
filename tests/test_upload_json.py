@@ -12,12 +12,12 @@ def upload_json_with_binary(url, json_data):
     else:
         print('Bad')
 
-binary_data = bytes('data to be encoded: 你好', 'utf-8')
+binary_data = bytes('data to be encoded: 你好, ya', 'utf-8')
 
 json_data = {
     "bucket": "Hysun_DianJiang", 
-    "name":"internal_demo.bin",
-    "position": 208,
+    "name":"demo2.bin",
+    "position": 260,
     "content": base64.b64encode(binary_data).decode(encoding='utf-8'),
     "append": "0"
 }

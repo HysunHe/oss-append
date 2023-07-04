@@ -25,12 +25,11 @@ def write_json():
             url='http://localhost:5000/write-json',
             headers={'Content-Type': 'application/json'},
             json={
-                "bucket": "Hysun_DianJiang",
-                "name":"test1.txt",
-                "position": 0,
+                "bucket": "Hysun_DianJiang", 
+                "name":"demo2.bin",
+                "position": 260,
                 "content": base64.b64encode(binary_data).decode(encoding='utf-8'),
-                "destination": "testcase1/test1.txt",
-                "append": "true"
+                "append": "1"
             }
         )
     """
@@ -71,7 +70,7 @@ def write_bytes():
     # pylint: disable=line-too-long
     """ Sample call to this API:
         binary_data = bytes('data to be encoded: 你好', 'utf-8')
-        url = 'http://localhost:5000/write-bytes?bucket=Hysun_DianJiang&name=testcase2/test1.bin&position=-1&append=true&destination=testcase2/test1.bin'
+        url = 'http://localhost:5000/write-bytes?bucket=Hysun_DianJiang&name=demo3.bin&position=0&append=1'
         response = requests.post(url=url, data=binary_data)
     """
     content_bytes = request.get_data()
