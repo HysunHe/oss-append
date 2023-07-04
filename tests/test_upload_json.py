@@ -15,13 +15,13 @@ binary_data = bytes('data to be encoded: 你好', 'utf-8')
 
 json_data = {
     "bucket": "Hysun_DianJiang", 
-    "name":"test2.txt",
+    "name":"testcase4/test2.txt",
     "position": -1,
     "content": base64.b64encode(binary_data).decode(encoding='utf-8'),
-    "destination": "testcase1/test2.txt",
+    "destination": "testcase4/test2.txt",
     "append": "0"
 }
 
-upload_url = 'http://localhost:5000/write-json'
+upload_url = 'http://132.226.236.106:5000/write-json'
 
 upload_json_with_binary(upload_url, json_data)
