@@ -7,8 +7,9 @@ import base64
 
 from pathlib import Path
 from flask import Flask, request
-from devlog import my_logger as log_utils
+from gevent import pywsgi
 
+from devlog import my_logger as log_utils
 from oci_config import OciConf as oci_conf
 
 logger = logging.getLogger(__name__)
@@ -194,7 +195,9 @@ def sync_object_storage(bucket_name: str, src_file: str, dest_file: str):
 
 def main():
     """ docstring """
-    app.run(host='0.0.0.0')
+    # app.run(host='0.0.0.0') # Dev mode
+    server = pywsgi.WSGIServer(('0.0.0.0', 5000), app)
+    server.serve_forever()
 
 
 if __name__ == '__main__':
