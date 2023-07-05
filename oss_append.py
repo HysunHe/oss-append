@@ -193,6 +193,7 @@ def sync_object_storage(bucket_name: str, src_file: str, dest_file: str):
             raise IOError(f'Failed to upload file {src_file}.') from ex
 
 
+@log_utils.debug_enabled(logger)
 def main():
     """ docstring """
     # app.run(host='0.0.0.0') # Dev mode
