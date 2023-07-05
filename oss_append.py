@@ -36,8 +36,7 @@ def write_json():
         )
     """
     data = request.get_json(force=True)
-    logger.debug('Got requested data: %s', data)
-
+    # logger.debug('Got requested data: %s', data)
     bucket = data['bucket']
     file_name = data['name']
     file_fullname = f'{_WORK_DIR}/{file_name}'
@@ -49,6 +48,9 @@ def write_json():
     content_base64 = data['content']
     append = data['append']
     content_bytes = base64.b64decode(content_base64)
+    logger.debug('file_name: %s', file_name)
+    logger.debug('file_position: %d, %d', file_position, whence)
+    logger.debug('append: %s', append)
 
     ensure_file_exists(file_fullname)
 
@@ -89,7 +91,7 @@ def write_bytes():
     whence = 2 if not request.args.get('position') or file_position < 0 else 0
     logger.debug('file_name: %s', file_name)
     logger.debug('file_position: %d, %d', file_position, whence)
-    logger.debug('data: %s', content_bytes)
+    # logger.debug('data: %s', content_bytes)
     logger.debug('append: %s', append)
 
     ensure_file_exists(file_fullname)
