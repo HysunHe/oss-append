@@ -5,9 +5,9 @@ certifi==2023.5.7
 cffi==1.15.1
 charset-normalizer==3.1.0
 circuitbreaker==1.4.0
-click
+click==8.0.4
 cryptography==39.0.2
-Flask==2.3.2
+Flask==2.2.2
 idna==3.4
 isort==5.12.0
 itsdangerous==2.1.2
