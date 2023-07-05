@@ -129,7 +129,7 @@ def ensure_file_exists(file_name):
             raise IOError(f'Failed to create file {file_name}.') from ex
 
 
-@log_utils.debug_enabled(logger)
+# @log_utils.debug_enabled(logger)
 # pylint: disable=too-many-arguments
 def handle_content(file_fullname, file_name, file_position, whence,
                    content_bytes, append, bucket, destination) -> int:
