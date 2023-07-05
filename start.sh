@@ -10,7 +10,7 @@ fi
 
 cd ~ > /dev/null
 
-git clone https://github.com/HysunHe/oss-append.git
+ls ~/oss-append > /dev/null 2>&1 || (git clone https://github.com/HysunHe/oss-append.git);
 
 cd ~/oss-append > /dev/null
 
