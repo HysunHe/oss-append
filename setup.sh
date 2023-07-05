@@ -10,7 +10,7 @@ fi
 
 cd ~/oss-append > /dev/null
 
-nohup python oss_append.py > ~/app.out 2>&1 &
+nohup python oss_append.py < /dev/null > ~/app.out 2>&1 &
 
 cd - > /dev/null
 
