@@ -8,8 +8,14 @@ then
 	kill -9 $pid > /dev/null 2>&1
 fi
 
-cd /home/ubuntu/oss-append > /dev/null
+cd ~ > /dev/null
+
+git clone https://github.com/HysunHe/oss-append.git
+
+cd ~/oss-append > /dev/null
 
 nohup python oss_append.py > ~/app.out 2>&1 &
 
 cd - > /dev/null
+
+echo "Started."
