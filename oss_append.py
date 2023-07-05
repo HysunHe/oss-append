@@ -19,6 +19,7 @@ _WORK_DIR = '/var/tmp/ossappend'
 
 
 @app.route('/write-json', methods=['POST'])
+@log_utils.debug_enabled(logger)
 def write_json():
     """ Sample call to the API:
         binary_data = bytes('data to be encoded: 你好', 'utf-8')
@@ -67,6 +68,7 @@ def write_json():
 
 
 @app.route('/write-bytes', methods=['POST'])
+@log_utils.debug_enabled(logger)
 def write_bytes():
     # pylint: disable=line-too-long
     """ Sample call to this API:
@@ -106,6 +108,7 @@ def write_bytes():
     return {'status': 'ok', 'current_file_position': pos, 'location': location}
 
 
+@log_utils.debug_enabled(logger)
 def ensure_file_exists(file_name):
     """ docstring """
     if os.path.isfile(file_name):
@@ -124,6 +127,7 @@ def ensure_file_exists(file_name):
             raise IOError(f'Failed to create file {file_name}.') from ex
 
 
+@log_utils.debug_enabled(logger)
 # pylint: disable=too-many-arguments
 def handle_content(file_fullname, file_name, file_position, whence,
                    content_bytes, append, bucket, destination) -> int:
@@ -146,6 +150,7 @@ def handle_content(file_fullname, file_name, file_position, whence,
     return current_position
 
 
+@log_utils.debug_enabled(logger)
 def delete_file(file_fullname, file_name):
     """ docstring """
     if not os.path.isfile(file_fullname):
@@ -171,6 +176,7 @@ def delete_file(file_fullname, file_name):
         tmp_dir = tmp_dir_parent
 
 
+@log_utils.debug_enabled(logger)
 def sync_object_storage(bucket_name: str, src_file: str, dest_file: str):
     """Upload a file to OCI Object Storage."""
 
