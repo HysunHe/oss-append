@@ -27,7 +27,6 @@ def check_run_auto_upload(bucket):
                 logger.debug('Upload file %s...done', file)
                 oss_utils.delete_file(file_name=file_path)
                 logger.debug('Local file %s...deleted', file)
-                __uploaded = __uploaded + 1
 
 
 def run(bucket):
