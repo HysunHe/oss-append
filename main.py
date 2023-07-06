@@ -5,7 +5,7 @@ from threading import Thread
 import auto_upload
 import oss_append
 
-if __name__ == '__main__':
+def run():
     bucket = os.environ.get('OSS_BUCKET')
     if not bucket:
         raise ValueError('Missing required env variable [OSS_BUCKET]')
@@ -13,4 +13,7 @@ if __name__ == '__main__':
     thread = Thread(target=auto_upload.run, args=(bucket, ), daemon=True)
     thread.start()
 
-    oss_append.run()
+    oss_append.run()    
+
+if __name__ == '__main__':
+    run()
