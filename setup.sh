@@ -10,6 +10,8 @@ fi
 
 cd ~/oss-append > /dev/null
 
+export _ENV_VAR_BUCKET=test
+
 nohup python oss_append.py < /dev/null > ~/app.out 2>&1 &
 
 cd - > /dev/null

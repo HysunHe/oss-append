@@ -8,53 +8,53 @@ from devlog import my_logger as log_utils
 
 logger = logging.getLogger(__name__)
 
+WORK_DIR = '/var/tmp/ossappend'
+
 
 @log_utils.debug_enabled(logger)
-def ensure_file_exists(work_dir: str, file_name: str):
+def ensure_file_exists(file_name: str):
     """ docstring """
-    file_fullname = f'{work_dir}/{file_name}'
+    file_fullname = f'{WORK_DIR}/{file_name}'
     if os.path.isfile(file_fullname):
         return  # file already exists
 
     file_path = Path(file_fullname)
     file_dir = file_path.parent.absolute()
-    command = f'mkdir -p {file_dir} && touch {file_fullname}'
-    try:
-        with log_utils.safe_rich_status(
-                f'[bold cyan]Creating file {file_name}[/]'):
-            subprocess.check_output(command, shell=True)
-    except subprocess.CalledProcessError as ex:
-        logger.error(ex.output)
-        with log_utils.print_exception_no_traceback():
-            raise IOError(f'Failed to create file {file_name}.') from ex
+    os.makedirs(name=file_dir, exist_ok=True)
+    Path(file_fullname).touch()
 
 
 @log_utils.debug_enabled(logger)
-def delete_file(work_dir: str, file_name: str):
+def delete_file(file_name: str):
     """ docstring """
+    if not os.path.isfile(file_name):
+        return  # file not exists
+    try:
+        os.remove(file_name)
+    except OSError:
+        pass
 
-    file_fullname = f'{work_dir}/{file_name}'
-    if not os.path.isfile(file_fullname):
-        return  # file already exists
 
-    tmp_dir = file_name
+@log_utils.debug_enabled(logger)
+def delete_path(relative_path: str):
+    """ docstring """
+    tmp_path = relative_path
     while True:
-        tmp_dir = Path(tmp_dir)
-        if str(tmp_dir) in ('.', '~', '/'):
+        tmp_path = Path(tmp_path)
+        if str(tmp_path) in ('.', '~', '/'):
             break
-
-        command = f'rm -rf {work_dir}/{tmp_dir}'
+        command = f'rm -rf {WORK_DIR}/{tmp_path}'
         try:
             with log_utils.safe_rich_status(
-                    f'[bold cyan]Deleting file {file_name}[/]'):
+                    f'[bold cyan]Deleting file {relative_path}[/]'):
                 subprocess.check_output(command, shell=True)
         except subprocess.CalledProcessError as ex:
             logger.error(ex.output)
             with log_utils.print_exception_no_traceback():
-                raise IOError(f'Failed to delete file {file_name}.') from ex
+                raise IOError(
+                    f'Failed to delete file {relative_path}.') from ex
 
-        tmp_dir_parent = tmp_dir.parent
-        tmp_dir = tmp_dir_parent
+        tmp_path = tmp_path.parent
 
 
 @log_utils.debug_enabled(logger)

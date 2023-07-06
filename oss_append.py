@@ -13,8 +13,6 @@ from oci_config import OciConf as oci_conf
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
-_WORK_DIR = '/var/tmp/ossappend'
-
 
 @app.route('/write-json', methods=['POST'])
 @log_utils.debug_enabled(logger)
@@ -48,7 +46,7 @@ def write_json():
     logger.debug('file_position: %d, %d', file_position, whence)
     logger.debug('append: %s', append)
 
-    oss_utils.ensure_file_exists(work_dir=_WORK_DIR, file_name=file_name)
+    oss_utils.ensure_file_exists(file_name=file_name)
 
     pos = handle_content(file_name=file_name,
                          file_position=file_position,
@@ -87,7 +85,7 @@ def write_bytes():
     logger.debug('file_position: %d, %d', file_position, whence)
     logger.debug('append: %s', append)
 
-    oss_utils.ensure_file_exists(work_dir=_WORK_DIR, file_name=file_name)
+    oss_utils.ensure_file_exists(file_name=file_name)
 
     pos = handle_content(file_name=file_name,
                          file_position=file_position,
@@ -108,7 +106,7 @@ def write_bytes():
 def handle_content(file_name, file_position, whence, content_bytes, append,
                    bucket, destination) -> int:
     """ docstring """
-    file_fullname = f'{_WORK_DIR}/{file_name}'
+    file_fullname = f'{oss_utils.WORK_DIR}/{file_name}'
     with open(file_fullname, 'rb+') as dest_file:
         logger.debug('Write content to file. file_position: %d, %d',
                      file_position, whence)
@@ -120,19 +118,15 @@ def handle_content(file_name, file_position, whence, content_bytes, append,
         logger.debug('Upload file %s...', file_name)
         oss_utils.sync_object_storage(bucket, file_fullname, destination)
         logger.debug('Upload file %s...done', file_name)
-        oss_utils.delete_file(work_dir=_WORK_DIR, file_name=file_name)
+        oss_utils.delete_file(file_name=file_fullname)
         logger.debug('Local file %s...deleted', file_name)
 
     return current_position
 
 
 @log_utils.debug_enabled(logger)
-def main():
+def run():
     """ docstring """
     # app.run(host='0.0.0.0') # Dev mode
     server = pywsgi.WSGIServer(('0.0.0.0', 5000), app)
     server.serve_forever()
-
-
-if __name__ == '__main__':
-    main()
