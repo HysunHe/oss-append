@@ -1,14 +1,12 @@
 """ Hysun He (hysun.he@oracle.com) @ 2023/07/04 """
 
 import logging
-import os
-import subprocess
 import base64
 
-from pathlib import Path
 from flask import Flask, request
 from gevent import pywsgi
 
+import oss_utils
 from devlog import my_logger as log_utils
 from oci_config import OciConf as oci_conf
 
@@ -36,10 +34,8 @@ def write_json():
         )
     """
     data = request.get_json(force=True)
-    # logger.debug('Got requested data: %s', data)
     bucket = data['bucket']
     file_name = data['name']
-    file_fullname = f'{_WORK_DIR}/{file_name}'
     # destination = file_name if 'destination' not in data or not data[
     #     'destination'] else data['destination']
     destination = file_name
@@ -52,10 +48,9 @@ def write_json():
     logger.debug('file_position: %d, %d', file_position, whence)
     logger.debug('append: %s', append)
 
-    ensure_file_exists(file_fullname)
+    oss_utils.ensure_file_exists(work_dir=_WORK_DIR, file_name=file_name)
 
-    pos = handle_content(file_fullname=file_fullname,
-                         file_name=file_name,
+    pos = handle_content(file_name=file_name,
                          file_position=file_position,
                          whence=whence,
                          content_bytes=content_bytes,
@@ -81,7 +76,6 @@ def write_bytes():
     content_bytes = request.get_data()
     bucket = request.args.get('bucket')
     file_name = request.args.get('name')
-    file_fullname = f'{_WORK_DIR}/{file_name}'
     append = request.args.get('append')
     file_position = int('0' if not request.args.get('position') else request.
                         args.get('position'))
@@ -91,13 +85,11 @@ def write_bytes():
     whence = 2 if not request.args.get('position') or file_position < 0 else 0
     logger.debug('file_name: %s', file_name)
     logger.debug('file_position: %d, %d', file_position, whence)
-    # logger.debug('data: %s', content_bytes)
     logger.debug('append: %s', append)
 
-    ensure_file_exists(file_fullname)
+    oss_utils.ensure_file_exists(work_dir=_WORK_DIR, file_name=file_name)
 
-    pos = handle_content(file_fullname=file_fullname,
-                         file_name=file_name,
+    pos = handle_content(file_name=file_name,
                          file_position=file_position,
                          whence=whence,
                          content_bytes=content_bytes,
@@ -105,36 +97,18 @@ def write_bytes():
                          bucket=bucket,
                          destination=destination)
 
+    # pylint: disable=line-too-long
     location = f'https://objectstorage.{oci_conf.get_region()}.oraclecloud.com/n/{oci_conf.get_namespace()}/b/{bucket}/o/{file_name}' if append and str(
         append).lower() not in ('true', '1') else ''
     return {'status': 'ok', 'current_file_position': pos, 'location': location}
 
 
-@log_utils.debug_enabled(logger)
-def ensure_file_exists(file_name):
-    """ docstring """
-    if os.path.isfile(file_name):
-        return  # file already exists
-
-    file_path = Path(file_name)
-    file_dir = file_path.parent.absolute()
-    command = f'mkdir -p {file_dir} && touch {file_name}'
-    try:
-        with log_utils.safe_rich_status(
-                f'[bold cyan]Creating file {file_name}[/]'):
-            subprocess.check_output(command, shell=True)
-    except subprocess.CalledProcessError as ex:
-        logger.error(ex.output)
-        with log_utils.print_exception_no_traceback():
-            raise IOError(f'Failed to create file {file_name}.') from ex
-
-
 # @log_utils.debug_enabled(logger)
 # pylint: disable=too-many-arguments
-def handle_content(file_fullname, file_name, file_position, whence,
-                   content_bytes, append, bucket, destination) -> int:
+def handle_content(file_name, file_position, whence, content_bytes, append,
+                   bucket, destination) -> int:
     """ docstring """
-    current_position = 0
+    file_fullname = f'{_WORK_DIR}/{file_name}'
     with open(file_fullname, 'rb+') as dest_file:
         logger.debug('Write content to file. file_position: %d, %d',
                      file_position, whence)
@@ -144,61 +118,12 @@ def handle_content(file_fullname, file_name, file_position, whence,
 
     if append and str(append).lower() not in ('true', '1'):
         logger.debug('Upload file %s...', file_name)
-        sync_object_storage(bucket, file_fullname, destination)
+        oss_utils.sync_object_storage(bucket, file_fullname, destination)
         logger.debug('Upload file %s...done', file_name)
-        delete_file(file_fullname=file_fullname, file_name=file_name)
+        oss_utils.delete_file(work_dir=_WORK_DIR, file_name=file_name)
         logger.debug('Local file %s...deleted', file_name)
 
     return current_position
-
-
-@log_utils.debug_enabled(logger)
-def delete_file(file_fullname, file_name):
-    """ docstring """
-    if not os.path.isfile(file_fullname):
-        return  # file already exists
-
-    tmp_dir = file_name
-    while True:
-        tmp_dir = Path(tmp_dir)
-        if str(tmp_dir) in ('.', '~', '/'):
-            break
-
-        command = f'rm -rf {_WORK_DIR}/{tmp_dir}'
-        try:
-            with log_utils.safe_rich_status(
-                    f'[bold cyan]Deleting file {file_name}[/]'):
-                subprocess.check_output(command, shell=True)
-        except subprocess.CalledProcessError as ex:
-            logger.error(ex.output)
-            with log_utils.print_exception_no_traceback():
-                raise IOError(f'Failed to delete file {file_name}.') from ex
-
-        tmp_dir_parent = tmp_dir.parent
-        tmp_dir = tmp_dir_parent
-
-
-@log_utils.debug_enabled(logger)
-def sync_object_storage(bucket_name: str, src_file: str, dest_file: str):
-    """Upload a file to OCI Object Storage."""
-
-    oci_cli_init = ['export OCI_CLI_SUPPRESS_FILE_PERMISSIONS_WARNING=True']
-
-    upload_via_ocicli = (f'oci os object put --bucket-name {bucket_name} '
-                         f'--name "{dest_file}" --file "{src_file}" --force')
-
-    commands = list(oci_cli_init)
-    commands.append(upload_via_ocicli)
-    commands_string = ' && '.join(commands)
-
-    try:
-        with log_utils.safe_rich_status(
-                f'[bold cyan]Uploading file {src_file}[/]'):
-            subprocess.check_output(commands_string, shell=True)
-    except subprocess.CalledProcessError as ex:
-        logger.error(ex.output)
-        with log_utils.print_exception_no_traceback():
-            raise IOError(f'Failed to upload file {src_file}.') from ex
 
 
 @log_utils.debug_enabled(logger)
