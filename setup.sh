@@ -10,7 +10,7 @@ fi
 
 cd ~/oss-append > /dev/null
 
-export OSS_BUCKET=Hysun_Bucket
+export OSS_BUCKET=test
 export NO_UPDATE_TIMEOUT_SECONDS=30
 
 nohup python main.py < /dev/null > ~/app.out 2>&1 &
