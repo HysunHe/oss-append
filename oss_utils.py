@@ -11,18 +11,22 @@ logger = logging.getLogger(__name__)
 WORK_DIR = '/var/tmp/ossappend'
 
 
-@log_utils.debug_enabled(logger)
 def ensure_file_exists(file_name: str):
     """ docstring """
     file_fullname = f'{WORK_DIR}/{file_name}'
+    ensure_dir_exists(file_fullname)
+    Path(file_fullname).touch()
+
+
+def ensure_dir_exists(file_fullname: str):
+    os.makedirs(name='/tmp/ossappend', exist_ok=True)
     if os.path.isfile(file_fullname):
         return  # file already exists
 
     file_path = Path(file_fullname)
     file_dir = file_path.parent.absolute()
     os.makedirs(name=file_dir, exist_ok=True)
-    Path(file_fullname).touch()
-
+    
 
 @log_utils.debug_enabled(logger)
 def delete_file(file_name: str):

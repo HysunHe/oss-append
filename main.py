@@ -10,8 +10,8 @@ def run():
     if not bucket:
         raise ValueError('Missing required env variable [OSS_BUCKET]')
 
-    thread = Thread(target=auto_upload.run, args=(bucket, ), daemon=True)
-    thread.start()
+    # thread = Thread(target=auto_upload.run, args=(bucket, ), daemon=True)
+    # thread.start()
 
     oss_append.run()    
 

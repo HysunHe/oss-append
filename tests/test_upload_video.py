@@ -14,5 +14,5 @@ def upload_binary_data(url, data):
 
 binary_data = file_to_bytes('/home/hysunhe/projects/aijianvideo/video1.mp4')
 # 调用API
-upload_url = 'http://132.226.236.106:5000/write-bytes?bucket=Hysun_Bucket&name=video2.mp4&position=1564706&append=0'
+upload_url = 'http://localhost:5000/append-mp4?bucket=Hysun_Bucket&name=video11.mp4&append=1'
 upload_binary_data(upload_url, binary_data)
