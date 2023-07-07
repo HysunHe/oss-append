@@ -33,7 +33,7 @@ def run(bucket, timeout):
     """ docstring """
     if timeout is None:
         timeout = _NOCHANGE_TIMEOUT_SECONDS
-            
+
     while True:
         check_run_auto_upload(bucket, timeout)
         time.sleep(2)

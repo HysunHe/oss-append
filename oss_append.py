@@ -196,7 +196,6 @@ def handle_content_video(file_name, content_bytes, append, bucket,
 
     oss_utils.delete_file(file_fullname)
     new_clips.write_videofile(file_fullname)
-    
 
     if append and str(append).lower() not in ('true', '1'):
         logger.debug('Upload file %s...', file_name)
