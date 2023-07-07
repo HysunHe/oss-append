@@ -5,15 +5,18 @@ from threading import Thread
 import auto_upload
 import oss_append
 
+
 def run():
     bucket = os.environ.get('OSS_BUCKET')
+    timeout = os.environ.get('NO_UPDATE_TIMEOUT_SECONDS')
     if not bucket:
         raise ValueError('Missing required env variable [OSS_BUCKET]')
 
-    # thread = Thread(target=auto_upload.run, args=(bucket, ), daemon=True)
+    # thread = Thread(target=auto_upload.run, args=(bucket, timeout,), daemon=True)
     # thread.start()
 
-    oss_append.run()    
+    oss_append.run()
+
 
 if __name__ == '__main__':
     run()

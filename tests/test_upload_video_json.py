@@ -19,7 +19,6 @@ def file_to_base64(path_file):
         return image_base64
 
 binary_data_base64 = file_to_base64('/home/hysunhe/projects/aijianvideo/video1.mp4')
-# 调用API
 json_data = {
     "bucket": "Hysun_Bucket", 
     "name":"video88.mp4",
