@@ -15,7 +15,7 @@ binary_data = bytes('data to be encoded: 你好, ya', 'utf-8')
 json_data = {
     "bucket": "test", 
     "name":"json.bin.1",
-    "position": 60,
+    "position": 0,
     "content": base64.b64encode(binary_data).decode(encoding='utf-8'),
     "append": "1"
 }

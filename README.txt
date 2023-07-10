@@ -25,7 +25,7 @@ else:
 Upload with bytes payload:
 -------------------------------
 binary_data = bytes('data to be encoded: 你好, ha', 'utf-8')
-upload_url = 'http://158.178.240.219:5000/write-bytes?bucket=Hysun_Bucket&name=demo2.bin&position=0&append=1'
+upload_url = 'http://158.178.240.219:5000/write-bytes?bucket=test&name=demo2.bin&position=0&append=1'
 
 response = requests.post(url=upload_url, data=binary_data)
 if response.status_code == 200:
