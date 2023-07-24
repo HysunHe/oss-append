@@ -44,6 +44,10 @@ def write_json():
             }
         )
     """
+    auth_result = authorize_request(request)
+    if auth_result is not None:
+        return auth_result
+
     data = request.get_json(force=True)
     bucket = data['bucket']
     file_name = data['name']
@@ -84,6 +88,10 @@ def write_bytes():
         url = 'http://localhost:5000/write-bytes?bucket=Hysun_DianJiang&name=demo3.bin&position=0&append=1'
         response = requests.post(url=url, data=binary_data)
     """
+    auth_result = authorize_request(request)
+    if auth_result is not None:
+        return auth_result
+
     content_bytes = request.get_data()
     bucket = request.args.get('bucket')
     file_name = request.args.get('name')
@@ -121,6 +129,10 @@ def write_mp4_json():
     """ Sample call to this API:
         url = 'http://localhost:5000/append-mp4-json'
     """
+    auth_result = authorize_request(request)
+    if auth_result is not None:
+        return auth_result
+
     data = request.get_json(force=True)
     bucket = data['bucket']
     file_name = data['name']
@@ -151,6 +163,10 @@ def write_mp4():
         url = 'http://localhost:5000/append-mp4?bucket=Hysun_DianJiang&name=demo3.bin&append=1'
         response = requests.post(url=url, data=video_bytes)
     """
+    auth_result = authorize_request(request)
+    if auth_result is not None:
+        return auth_result
+
     content_bytes = request.get_data()
     bucket = request.args.get('bucket')
     file_name = request.args.get('name')
@@ -171,6 +187,19 @@ def write_mp4():
     location = f'https://objectstorage.{oci_conf.get_region()}.oraclecloud.com/n/{oci_conf.get_namespace()}/b/{bucket}/o/{file_name}' if append and str(
         append).lower() not in ('true', '1') else ''
     return {'status': 'ok', 'current_file_position': -1, 'location': location}
+
+
+def authorize_request(req):
+    """ docstring """
+    headers = req.headers
+    x_amz_date = headers.get('X-Amz-Date')
+    assert x_amz_date is not None, 'Mising required header: X-Amz-Date'
+    authorization = headers.get('Authorization')
+    assert authorization is not None, 'Mising required header: Authorization'
+    auth_local = oss_utils.gen_auth_md5(x_amz_date)
+    if authorization != auth_local:
+        return 'Unauthorized', 401
+    return None
 
 
 def handle_content_video(file_name, content_bytes, append, bucket,

@@ -1,9 +1,12 @@
 """ Hysun He (hysun.he@oracle.com) @ 2023/07/06 """
 
 import os
+import base64
+import hashlib
 import logging
 import subprocess
 from pathlib import Path
+from oci_config import OciConf as oci_conf
 from devlog import my_logger as log_utils
 
 logger = logging.getLogger(__name__)
@@ -83,3 +86,14 @@ def sync_object_storage(bucket_name: str, src_file: str, dest_file: str):
         logger.error(ex.output)
         with log_utils.print_exception_no_traceback():
             raise IOError(f'Failed to upload file {src_file}.') from ex
+
+
+@log_utils.debug_enabled(logger)
+def gen_auth_md5(datetime: str) -> str:
+    """ auth header """
+    access_key = oci_conf.get_accesskey()
+    secret_key = oci_conf.get_secretkey()
+    md5_str = hashlib.md5(
+        f'{access_key}{secret_key}{datetime}'.encode()).digest()
+    base64_str = base64.b64encode(md5_str).decode()
+    return base64_str

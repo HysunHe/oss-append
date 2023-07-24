@@ -39,3 +39,17 @@ class OciConf:
                 compartment_id=cls.oci_config()['tenancy'])  #pylint: disable=unsubscriptable-object
             cls._NAMESPACE = response.data
         return cls._NAMESPACE
+
+    @classmethod
+    def get_accesskey(cls) -> str:
+        """ docstring """
+        access_key = cls.oci_config()['access_key']  #pylint: disable=unsubscriptable-object
+        assert access_key is not None, 'access_key field is required'
+        return access_key
+
+    @classmethod
+    def get_secretkey(cls) -> str:
+        """ docstring """
+        secret_key = cls.oci_config()['secret_key']  #pylint: disable=unsubscriptable-object
+        assert secret_key is not None, 'secret_key field is required'
+        return secret_key
