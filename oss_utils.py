@@ -16,19 +16,18 @@ WORK_DIR = '/var/tmp/ossappend'
 
 def ensure_file_exists(file_name: str):
     """ docstring """
-    file_fullname = f'{WORK_DIR}/{file_name}'
-    ensure_dir_exists(file_fullname)
-    Path(file_fullname).touch()
-
-
-def ensure_dir_exists(file_fullname: str):
-    """ docstring """
-    os.makedirs(name='/tmp/ossappend', exist_ok=True)
-    if os.path.isfile(file_fullname):
+    if os.path.isfile(file_name):
         return  # file already exists
+    ensure_file_dir_exists(file_name)
+    Path(file_name).touch()
 
+
+def ensure_file_dir_exists(file_fullname: str):
+    """ docstring """
     file_path = Path(file_fullname)
     file_dir = file_path.parent.absolute()
+    if os.path.isdir(file_dir):
+        return  # dir already exists
     os.makedirs(name=file_dir, exist_ok=True)
 
 

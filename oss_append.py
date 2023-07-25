@@ -63,8 +63,6 @@ def write_json():
     logger.debug('file_position: %d, %d', file_position, whence)
     logger.debug('append: %s', append)
 
-    oss_utils.ensure_file_exists(file_name=file_name)
-
     pos = handle_content(file_name=file_name,
                          file_position=file_position,
                          whence=whence,
@@ -105,8 +103,6 @@ def write_bytes():
     logger.debug('file_name: %s', file_name)
     logger.debug('file_position: %d, %d', file_position, whence)
     logger.debug('append: %s', append)
-
-    oss_utils.ensure_file_exists(file_name=file_name)
 
     pos = handle_content(file_name=file_name,
                          file_position=file_position,
@@ -206,9 +202,9 @@ def handle_content_video(file_name, content_bytes, append, bucket,
                          destination):
     """ docstring """
     file_fullname = f'{oss_utils.WORK_DIR}/{file_name}'
-    oss_utils.ensure_dir_exists(file_fullname)
-
-    tmp_clip_file = f'/tmp/{file_name}_{int(time.time())}.mp4'
+    oss_utils.ensure_file_dir_exists(file_fullname)
+    os.makedirs(name='/tmp/ossappend', exist_ok=True)
+    tmp_clip_file = f'/tmp/ossappend/{file_name}_{int(time.time())}.mp4'
     with open(tmp_clip_file, 'wb') as clip_file:
         clip_file.write(content_bytes)
     this_clip = VideoFileClip(tmp_clip_file)
@@ -225,6 +221,7 @@ def handle_content_video(file_name, content_bytes, append, bucket,
 
     oss_utils.delete_file(file_fullname)
     new_clips.write_videofile(file_fullname)
+    oss_utils.delete_file(tmp_clip_file)
 
     if append and str(append).lower() not in ('true', '1'):
         logger.debug('Upload file %s...', file_name)
@@ -240,6 +237,8 @@ def handle_content(file_name, file_position, whence, content_bytes, append,
                    bucket, destination) -> int:
     """ docstring """
     file_fullname = f'{oss_utils.WORK_DIR}/{file_name}'
+    oss_utils.ensure_file_exists(file_fullname)
+    
     with open(file_fullname, 'rb+') as dest_file:
         logger.debug('Write content to file. file_position: %d, %d',
                      file_position, whence)
