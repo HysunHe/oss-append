@@ -25,6 +25,6 @@ def upload_binary_data(url, data):
 
 binary_data = bytes('data to be encoded: 你好, ha', 'utf-8')
 
-upload_url = 'http://158.178.240.219:5000/write-bytes?bucket=test&name=demo2.bin&position=0&append=1'
+upload_url = 'http://158.178.240.219:5000/write-bytes?bucket=test&name=yyy/demo3.bin&position=0&append=1'
 
 upload_binary_data(upload_url, binary_data)

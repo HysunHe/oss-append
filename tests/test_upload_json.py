@@ -27,15 +27,11 @@ def upload_json_with_binary(url, json_data):
         print(f'{response.status_code}:{response.text}')
 
 binary_data = bytes('data to be encoded: 你好, ya', 'utf-8')
-print(base64.b64encode(binary_data).decode(encoding='utf-8'))
-if 1<2:
-    import sys
-    sys.exit(0)
 json_data = {
     "bucket": "test", 
-    "name":"json.bin.1",
+    "name":"hhh/json.bin.x2",
     "position": 0,
-    "content": base64.b64encode(bytes('data')).decode(encoding='utf-8'),
+    "content": base64.b64encode(binary_data).decode(encoding='utf-8'),
     "append": "1"
 }
 # upload_url = 'http://132.226.236.106:5000/write-json'
