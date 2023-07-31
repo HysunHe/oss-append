@@ -15,18 +15,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 
-@app.route('/test-upload', methods=['POST'])
-@log_utils.debug_enabled(logger)
-def test_upload():
-    """ docstring """
-    video_bytes = request.data
-    with open('/tmp/dummyvideo.mp4', 'wb') as file:
-        file.write(video_bytes)
-    return 'Good'
-
-
 @app.route('/write-json', methods=['POST'])
-@log_utils.debug_enabled(logger)
 def write_json():
     """ JSON payload """
     auth_result = authorize_request(request)
@@ -61,7 +50,6 @@ def write_json():
 
 
 @app.route('/write-bytes', methods=['POST'])
-@log_utils.debug_enabled(logger)
 def write_bytes():
     """ Bytes payload """
     auth_result = authorize_request(request)
@@ -107,7 +95,6 @@ def authorize_request(req):
     return None
 
 
-# @log_utils.debug_enabled(logger)
 # pylint: disable=too-many-arguments
 def handle_content(file_name, file_position, whence, content_bytes, append,
                    bucket, destination) -> int:
