@@ -1,5 +1,6 @@
 """ Hysun He (hysun.he@oracle.com) @ 2023/07/04 """
 
+import os
 import logging
 import base64
 
@@ -113,7 +114,7 @@ def handle_content(file_name, file_position, whence, content_bytes, append,
     """ docstring """
     file_fullname = f'{oss_utils.WORK_DIR}/{file_name}'
     oss_utils.ensure_file_exists(file_fullname)
-    
+
     with open(file_fullname, 'rb+') as dest_file:
         logger.debug('Write content to file. file_position: %d, %d',
                      file_position, whence)
@@ -122,11 +123,7 @@ def handle_content(file_name, file_position, whence, content_bytes, append,
         current_position = dest_file.tell()
 
     if append and str(append).lower() not in ('true', '1'):
-        logger.debug('Upload file %s...', file_name)
-        oss_utils.sync_object_storage(bucket, file_fullname, destination)
-        logger.debug('Upload file %s...done', file_name)
-        oss_utils.delete_file(file_name=file_fullname)
-        logger.debug('Local file %s...deleted', file_name)
+        oss_utils.enqueue_task(bucket, file_fullname, destination)
 
     return current_position
 
@@ -135,5 +132,7 @@ def handle_content(file_name, file_position, whence, content_bytes, append,
 def run():
     """ docstring """
     # app.run(host='0.0.0.0') # Dev mode
-    server = pywsgi.WSGIServer(('0.0.0.0', 5000), app)
+    host = os.environ.get('SERVER_HOST', '0.0.0.0')
+    port = os.environ.get('SERVER_LISTEN_PORT', 5000)
+    server = pywsgi.WSGIServer((host, port), app)
     server.serve_forever()

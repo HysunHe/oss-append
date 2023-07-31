@@ -2,8 +2,9 @@
 import os
 from threading import Thread
 
-import auto_upload
-import oss_append
+import cleaner
+import req_processor
+import file_syncer
 
 
 def run():
@@ -13,15 +14,16 @@ def run():
     if not bucket:
         raise ValueError('Missing required env variable [OSS_BUCKET]')
 
-    thread = Thread(target=auto_upload.run,
-                    args=(
-                        bucket,
-                        timeout,
-                    ),
-                    daemon=True)
+    thread = Thread(target=cleaner.run, args=(
+        bucket,
+        timeout,
+    ), daemon=True)
     thread.start()
 
-    oss_append.run()
+    req_processor.run()
+
+    thread = Thread(target=file_syncer.run, daemon=True)
+    thread.start()
 
 
 if __name__ == '__main__':
