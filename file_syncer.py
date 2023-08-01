@@ -4,6 +4,7 @@ import os
 import logging
 from concurrent.futures import ThreadPoolExecutor
 import my_utils
+import env_config
 from task_queue import TqMgr
 
 logger = logging.getLogger(__name__)
@@ -20,9 +21,12 @@ def task(bucket_name, src_file, dest_file):
 def run():
     """ docstring """
     cpu_count = os.cpu_count()
-    parallel = cpu_count - 2 if cpu_count and cpu_count > 2 else 1
+    dop = env_config.SYNCER_DOP if env_config.SYNCER_DOP > 0 else cpu_count - 2 if cpu_count and cpu_count > 2 else 1
 
-    with ThreadPoolExecutor(max_workers=parallel) as executor:
+    # pylint: disable=logging-fstring-interpolation
+    logger.info(f'CPU cores: {cpu_count} | DOP is {dop}')
+
+    with ThreadPoolExecutor(max_workers=dop) as executor:
         while True:
             (bucket_name, src_file, dest_file) = TqMgr.inst().poll()
             executor.submit(task, bucket_name, src_file, dest_file)

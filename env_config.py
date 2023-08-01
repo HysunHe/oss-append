@@ -16,3 +16,5 @@ NO_UPDATE_TIMEOUT_SECONDS = int(os.environ.get('NO_UPDATE_TIMEOUT_SECONDS',
 SERVER_HOST = os.environ.get('SERVER_HOST', '0.0.0.0')
 
 SERVER_LISTEN_PORT = int(os.environ.get('SERVER_LISTEN_PORT', 5000))
+
+SYNCER_DOP = int(os.environ.get('SYNCER_DOP', 0))
