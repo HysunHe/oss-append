@@ -8,6 +8,7 @@ import contextlib
 from logging import Logger
 from datetime import datetime
 import rich.console as rich_console
+import env_config
 
 _console = rich_console.Console()
 _STATUS = None
@@ -18,7 +19,7 @@ logging.basicConfig(encoding='utf8')
 _formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 _logger = logging.getLogger()
-_logger.setLevel(logging.DEBUG)
+_logger.setLevel(env_config.DEBUG_LEVEL)
 
 # _console_handler = logging.StreamHandler(sys.stdout)
 # _console_handler.setFormatter(_formatter)

@@ -21,6 +21,8 @@ def task(bucket_name, src_file, dest_file):
 def run():
     """ docstring """
     cpu_count = os.cpu_count()
+
+    # pylint: disable=line-too-long
     dop = env_config.SYNCER_DOP if env_config.SYNCER_DOP > 0 else cpu_count - 2 if cpu_count and cpu_count > 2 else 1
 
     # pylint: disable=logging-fstring-interpolation

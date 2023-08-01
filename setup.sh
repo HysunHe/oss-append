@@ -19,6 +19,7 @@ export SYNCER_DOP=8
 export SERVER_HOST="0.0.0.0"
 export SERVER_LISTEN_PORT=5000
 export OCI_CONFIG_FILE="~/.oci/config"
+export DEBUG_LEVEL=20
 
 nohup python main.py < /dev/null > ~/app.out 2>&1 &
 
