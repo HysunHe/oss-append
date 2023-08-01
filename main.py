@@ -14,16 +14,18 @@ def run():
     if not bucket:
         raise ValueError('Missing required env variable [OSS_BUCKET]')
 
-    thread = Thread(target=cleaner.run, args=(
-        bucket,
-        timeout,
-    ), daemon=True)
-    thread.start()
+    syncer_thread = Thread(target=file_syncer.run, daemon=True)
+    syncer_thread.start()
+
+    cleaner_thread = Thread(target=cleaner.run,
+                            args=(
+                                bucket,
+                                timeout,
+                            ),
+                            daemon=True)
+    cleaner_thread.start()
 
     req_processor.run()
-
-    thread = Thread(target=file_syncer.run, daemon=True)
-    thread.start()
 
 
 if __name__ == '__main__':

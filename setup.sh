@@ -17,6 +17,7 @@ export OCI_CLI_SUPPRESS_FILE_PERMISSIONS_WARNING=True
 export MAX_QUEUE_SIZE=2000000
 export SERVER_HOST="0.0.0.0"
 export SERVER_LISTEN_PORT=5000
+export OCI_CONFIG_FILE="~/.oci/config"
 
 nohup python main.py < /dev/null > ~/app.out 2>&1 &
 

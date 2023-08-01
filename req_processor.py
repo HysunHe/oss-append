@@ -1,15 +1,16 @@
 """ Hysun He (hysun.he@oracle.com) @ 2023/07/04 """
 
-import os
 import logging
 import base64
 
 from flask import Flask, request
 from gevent import pywsgi
 
-import oss_utils
+import my_utils
+import env_config
 from devlog import my_logger as log_utils
 from oci_config import OciConf as oci_conf
+from task_queue import TqMgr
 
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
@@ -89,7 +90,7 @@ def authorize_request(req):
     assert x_amz_date is not None, 'Mising required header: X-Amz-Date'
     authorization = headers.get('Authorization')
     assert authorization is not None, 'Mising required header: Authorization'
-    auth_local = oss_utils.gen_auth_md5(x_amz_date)
+    auth_local = my_utils.gen_auth_md5(x_amz_date)
     if authorization != auth_local:
         return 'Unauthorized', 401
     return None
@@ -99,8 +100,8 @@ def authorize_request(req):
 def handle_content(file_name, file_position, whence, content_bytes, append,
                    bucket, destination) -> int:
     """ docstring """
-    file_fullname = f'{oss_utils.WORK_DIR}/{file_name}'
-    oss_utils.ensure_file_exists(file_fullname)
+    file_fullname = f'{my_utils.WORK_DIR}/{file_name}'
+    my_utils.ensure_file_exists(file_fullname)
 
     with open(file_fullname, 'rb+') as dest_file:
         logger.debug('Write content to file. file_position: %d, %d',
@@ -110,7 +111,7 @@ def handle_content(file_name, file_position, whence, content_bytes, append,
         current_position = dest_file.tell()
 
     if append and str(append).lower() not in ('true', '1'):
-        oss_utils.enqueue_task(bucket, file_fullname, destination)
+        TqMgr.inst().enqueue(task_tuple=(bucket, file_fullname, destination))
 
     return current_position
 
@@ -119,7 +120,7 @@ def handle_content(file_name, file_position, whence, content_bytes, append,
 def run():
     """ docstring """
     # app.run(host='0.0.0.0') # Dev mode
-    host = os.environ.get('SERVER_HOST', '0.0.0.0')
-    port = os.environ.get('SERVER_LISTEN_PORT', 5000)
+    host = env_config.SERVER_HOST
+    port = env_config.SERVER_LISTEN_PORT
     server = pywsgi.WSGIServer((host, port), app)
     server.serve_forever()

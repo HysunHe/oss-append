@@ -4,12 +4,12 @@ import os
 import time
 import logging
 from pathlib import Path
-import oss_utils
+import my_utils
+from task_queue import TqMgr
 
 logger = logging.getLogger(__name__)
 
-_NOCHANGE_TIMEOUT_SECONDS = 30
-_SCAN_DIR = oss_utils.WORK_DIR
+_SCAN_DIR = my_utils.WORK_DIR
 
 
 def cleanup(bucket, timeout):
@@ -28,7 +28,7 @@ def process_file_upload(root_dir, file, bucket, timeout):
         diff_seconds = int(time.time() - Path(file_path).stat().st_mtime)
         if diff_seconds >= int(timeout):
             dest_path = Path(file_path).relative_to(_SCAN_DIR)
-            oss_utils.enqueue_task(bucket, file_path, dest_path)
+            TqMgr.inst().enqueue(task_tuple=(bucket, file_path, dest_path))
     except FileNotFoundError:
         logger.debug('process_file_upload:: FileNotFoundError is OK')
     except IOError as err:
@@ -55,9 +55,6 @@ def process_dir_cleanup(root_dir, sub_dir, timeout):
 
 def run(bucket, timeout):
     """ docstring """
-    if timeout is None:
-        timeout = _NOCHANGE_TIMEOUT_SECONDS
-
     while True:
         cleanup(bucket, timeout)
         time.sleep(2)

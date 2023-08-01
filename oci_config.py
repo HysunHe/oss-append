@@ -1,10 +1,10 @@
 """ Hysun He (hysun.he@oracle.com) @ 2023/07/04 """
 import oci
+import env_config
 
 
 class OciConf:
     """ docstring """
-    _CONFIG_PATH = '~/.oci/config'
     _OCI_CONF = None
     _NAMESPACE = None
 
@@ -13,7 +13,7 @@ class OciConf:
         """ docstring """
         if cls._OCI_CONF is None:
             cls._OCI_CONF = oci.config.from_file(
-                file_location=cls._CONFIG_PATH)
+                file_location=env_config.OCI_CONFIG_FILE)
         return cls._OCI_CONF
 
     @classmethod

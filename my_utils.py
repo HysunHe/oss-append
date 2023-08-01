@@ -5,7 +5,6 @@ import base64
 import hashlib
 import logging
 import subprocess
-import queue
 from pathlib import Path
 from oci_config import OciConf as oci_conf
 from devlog import my_logger as log_utils
@@ -13,7 +12,6 @@ from devlog import my_logger as log_utils
 logger = logging.getLogger(__name__)
 
 WORK_DIR = os.environ.get('BUF_FILE_DIR', '/var/tmp/ossappend')
-SYNC_TASK_QUEUE = queue.Queue(os.environ.get('MAX_QUEUE_SIZE', 0))
 
 
 def ensure_file_exists(file_name: str):
@@ -41,13 +39,6 @@ def delete_file(file_name: str):
         os.remove(file_name)
     except OSError:
         pass
-
-
-def enqueue_task(bucket_name: str, src_file: str, dest_file: str):
-    """ docstring """
-    task = (bucket_name, src_file, dest_file)
-    logger.debug('enqueue task %s ==> %s', src_file, dest_file)
-    SYNC_TASK_QUEUE.put(task)
 
 
 def sync_object_storage(bucket_name: str, src_file: str, dest_file: str):
