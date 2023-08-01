@@ -7,11 +7,11 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-import oss_utils
+import my_utils
 
 def upload_binary_data(url, data):
     x_amz_date = '20230724T023712Z'
-    auth_header = oss_utils.gen_auth_md5(x_amz_date)
+    auth_header = my_utils.gen_auth_md5(x_amz_date)
     headers = {
         'X-Amz-Date': x_amz_date,
         'Authorization': auth_header

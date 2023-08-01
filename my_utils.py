@@ -47,9 +47,9 @@ def sync_object_storage(bucket_name: str, src_file: str, dest_file: str):
     upload_via_ocicli = (f'oci os object put --bucket-name {bucket_name} '
                          f'--name "{dest_file}" --file "{src_file}" --force')
     try:
-        with log_utils.safe_rich_status(
-                f'[bold cyan]Uploading file {src_file}[/]'):
-            subprocess.check_output(upload_via_ocicli, shell=True)
+        # with log_utils.safe_rich_status(
+        #         f'[bold cyan]Uploading file {src_file}[/]'):
+        subprocess.check_output(upload_via_ocicli, shell=True)
         delete_file(file_name=src_file)
         logger.debug('Local file %s...deleted', src_file)
     except subprocess.CalledProcessError as ex:

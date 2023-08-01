@@ -9,11 +9,11 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-import oss_utils
+import my_utils
 
 def upload_json_with_binary(url, json_data):
     x_amz_date = '20230724T023712Z'
-    auth_header = oss_utils.gen_auth_md5(x_amz_date)
+    auth_header = my_utils.gen_auth_md5(x_amz_date)
     headers = {
         'Content-Type': 'application/json',
         'X-Amz-Date': x_amz_date,
@@ -30,9 +30,9 @@ binary_data = bytes('data to be encoded: 你好, ya', 'utf-8')
 json_data = {
     "bucket": "test", 
     "name":"hhh/json.bin.x2",
-    "position": 0,
+    "position": 30,
     "content": base64.b64encode(binary_data).decode(encoding='utf-8'),
-    "append": "1"
+    "append": "0"
 }
 # upload_url = 'http://132.226.236.106:5000/write-json'
 upload_url = 'http://158.178.240.219:5000/write-json'
